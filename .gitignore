@@ -127,3 +127,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+PackagePref.txt
+
+#Pycharm
+.idea/
+ffprobe.exe
+ffplay.exe
+ffmpeg.exe
