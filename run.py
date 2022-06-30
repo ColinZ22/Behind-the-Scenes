@@ -3,6 +3,7 @@ import sys
 from Recognition import AudioRecognition
 from Recognition import SongDetails
 from Recognition import FileManip
+from Recognition import APIs
 import os
 
 completedSongs = {}
@@ -27,6 +28,9 @@ def audioProcess(dir):  # dir is the directory of the songs to be processed
             continue
 
 if __name__ == '__main__':
+
+    APIs.getAPIKeys()
+
     if len(sys.argv) == 1:
         print("Please provide a directory of songs to be processed")
         dir = input("Full Path to Folder: ").strip()
@@ -38,7 +42,8 @@ if __name__ == '__main__':
     print(completedSongs)
     print("Songs failed: ", len(errerSongs))
     print(errerSongs)
-    os.remove(r"Temp\trimmedSong.mp3")
-    os.remove(r".cache")
-
+    if os.path.exists(r"Temp\trimmedSong.mp3"):
+        os.remove(r"Temp\trimmedSong.mp3")
+    if os.path.exists(r".cache"):
+        os.remove(r".cache")
     print("\nOperation Complete.")

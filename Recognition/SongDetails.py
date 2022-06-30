@@ -3,12 +3,17 @@ import requests
 import json
 from spotipy.oauth2 import SpotifyClientCredentials
 from Recognition import FileManip
+from Recognition import APIs
 
-auth_manager = SpotifyClientCredentials(client_id="671865bb1aa942d89f8461cb1dcfdbbb",
-                                        client_secret="82a9fba6ed3749579106ceb8de478dc4")
-spotify = spotipy.Spotify(auth_manager=auth_manager)
+
+def getSpotify():
+    auth_manager = SpotifyClientCredentials(client_id=APIs.apiKeys["Spotify API Key"],
+                                            client_secret=APIs.apiKeys["Spotify API Secret"])
+    return spotipy.Spotify(auth_manager=auth_manager)
+
 
 def getSongURISpotify(songName, artist):
+    spotify = getSpotify()
     results = spotify.search(q='track:' + songName + ' artist:' + artist, type='track')
     try:
         return results['tracks']['items'][0]['uri']
@@ -18,6 +23,7 @@ def getSongURISpotify(songName, artist):
         return None
 
 def getSongEnergySpotify(songURI):
+    spotify = getSpotify()
     song = spotify.audio_features(songURI)
     try:
         return song[0]['energy']
@@ -26,10 +32,12 @@ def getSongEnergySpotify(songURI):
         print("Error:", e)
         return None
 def getSongAlbumSpotify(songURI):
+    spotify = getSpotify()
     song = spotify.track(songURI)
     return song['album']['name']
 
 def getSongGenreSpotify(songURI):
+    spotify = getSpotify()
     songAlbumUri = spotify.track(songURI)['album']['uri']
     songAlbum = spotify.album(songAlbumUri)
     albumGenre = songAlbum['genres']
@@ -44,7 +52,7 @@ def getSongGenreAudioDB(songName, artist):
     querystring = {"s": artist, "t": songName}
 
     headers = {
-        "X-RapidAPI-Key": "0d23d67a85msh4135704ba68fb5fp1cbfbajsn1d1390403884",
+        "X-RapidAPI-Key": APIs.apiKeys["Rapid API Key"],
         "X-RapidAPI-Host": "theaudiodb.p.rapidapi.com"
     }
 
@@ -64,22 +72,16 @@ def getSongGenreShazam(songName):
     querystring = {"term": songName, "locale": "en-US", "offset": "0", "limit": "5"}
 
     headers = {
-        "X-RapidAPI-Key": "0d23d67a85msh4135704ba68fb5fp1cbfbajsn1d1390403884",
+        "X-RapidAPI-Key": APIs.apiKeys["Rapid API Key"],
         "X-RapidAPI-Host": "shazam.p.rapidapi.com"
     }
 
     response = requests.request("GET", searchUrl, headers=headers, params=querystring)
     songKey = response.json()['tracks']['hits'][0]['track']['key']
 
-
     detailsUrl = "https://shazam.p.rapidapi.com/songs/get-details"
 
     querystring = {"key": songKey, "locale": "en-US"}
-
-    headers = {
-        "X-RapidAPI-Key": "0d23d67a85msh4135704ba68fb5fp1cbfbajsn1d1390403884",
-        "X-RapidAPI-Host": "shazam.p.rapidapi.com"
-    }
 
     response = requests.request("GET", detailsUrl, headers=headers, params=querystring)
 

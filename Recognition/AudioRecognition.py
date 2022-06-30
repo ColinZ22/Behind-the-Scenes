@@ -7,6 +7,7 @@ import time
 from pydub import AudioSegment
 import fleep
 from shazamio import Shazam
+from Recognition import APIs
 
 def isFakeMp3(songDir):
     info = fleep.get(open(songDir, "rb").read(128))
@@ -18,7 +19,7 @@ def isFakeMp3(songDir):
         return False
 
 def trimSong(songDir,
-             tempFileDir=r"C:\Users\19056\OneDrive\Documents\GitHub\BehindTheScenes\Temp",
+             tempFileDir= os.getcwd() + "\Temp",
              startTimeSeconds=0,
              endTimeSeconds=8):
     try:
@@ -47,7 +48,7 @@ def getSongNameAudd(songDir):
     results = {}
 
     data = {
-        'api_token': '94ec5ee167030dc6b37df8c6ce79afae',
+        'api_token': APIs.apiKeys["Audd API Token"],
         'return': 'apple_music,spotify',
     }
     try:
@@ -73,8 +74,8 @@ def getSongNameACRCloud(songDir):
 
     results = {}
 
-    access_key = "a9909fab24e3e38b5f8c6cbbb4ec6ebf"
-    access_secret = "7q7DRYCAeG8Xw8lbK9WSby2dkGjxHnBWOANfdS1M"
+    access_key = APIs.apiKeys["ACRCloud Access Key"]
+    access_secret = APIs.apiKeys[ "ACRCloud API Access Secret"]
     requrl = "http://identify-eu-west-1.acrcloud.com/v1/identify"
 
     http_method = "POST"
@@ -118,6 +119,7 @@ def getSongNameACRCloud(songDir):
         print("Error:", e)
         return None
 
+# Not used, but can be used as a backup method
 def getSongNameShazam(songDir):
 
     url = "https://shazam-core.p.rapidapi.com/v1/tracks/recognize"
@@ -126,7 +128,7 @@ def getSongNameShazam(songDir):
     payload = importSongStream(trimSong(songDir))
     headers = {
         "content-type": "multipart/form-data; boundary=---011000010111000001101001",
-        "X-RapidAPI-Key": "0d23d67a85msh4135704ba68fb5fp1cbfbajsn1d1390403884",
+        "X-RapidAPI-Key": APIs.apiKeys["Rapid API Key"],
         "X-RapidAPI-Host": "shazam-core.p.rapidapi.com"
     }
 
