@@ -19,7 +19,7 @@ def getSongURISpotify(songName, artist):
         return results['tracks']['items'][0]['uri']
     except Exception as e:
         print(results)
-        print("Error:", e)
+        print("Spotify failed to find track:", e)
         return None
 
 def getSongEnergySpotify(songURI):
@@ -29,12 +29,17 @@ def getSongEnergySpotify(songURI):
         return song[0]['energy']
     except Exception as e:
         print(song)
-        print("Error:", e)
-        return None
+        print("Spotify failed to get Song Energy:", e)
+        return ""
 def getSongAlbumSpotify(songURI):
     spotify = getSpotify()
     song = spotify.track(songURI)
-    return song['album']['name']
+    try:
+        return song['album']['name']
+    except Exception as e:
+        print(song)
+        print("Spotify failed to get Song Album:", e)
+        return ""
 
 def getSongGenreSpotify(songURI):
     spotify = getSpotify()
@@ -42,7 +47,8 @@ def getSongGenreSpotify(songURI):
     songAlbum = spotify.album(songAlbumUri)
     albumGenre = songAlbum['genres']
     if albumGenre == []:
-        return None
+        print("Spotify failed to get genre for album:", songAlbum)
+        return ""
     else:
         return albumGenre
 
@@ -62,7 +68,7 @@ def getSongGenreAudioDB(songName, artist):
         return response.json()['track'][0]['strGenre']
     except Exception as e:
         print(response)
-        print("Error:", e)
+        print("AudioDB failed to find Genre:", e)
         return None
 
 def getSongGenreShazam(songName):
@@ -88,26 +94,25 @@ def getSongGenreShazam(songName):
     if "genre" in response.json():
         return response.json()['genres']['primary']
     else:
+        print("Shazam failed to find Genre")
         return None
 
 def autoFillDetails(songDir, songName, artist, genre = None):
+    FileManip.editMp3Details(songDir, artist, "", songName, genre, "")
     energy = getSongEnergySpotify(getSongURISpotify(songName, artist))
     album = getSongAlbumSpotify(getSongURISpotify(songName, artist))
     if genre == None:
         genre = getSongGenreSpotify(getSongURISpotify(songName, artist))
-        if genre == None:
+        if genre == "":
             print("No genre found for " + songName + " in the Spotify database, trying AudioDB...")
             genre = getSongGenreAudioDB(songName, artist)
-            if genre == None:
+            if genre == "":
                 print("No genre found for " + songName + " in the AudioDB database, trying Shazam...")
                 genre = getSongGenreShazam(songName)
-                if genre == None:
+                if genre == "":
                     print("No genre found for " + songName + " in the Shazam database, genre detection failed :( \n")
-                    genre = '' # If no genre is found, set it to empty string
+
     print("Filling in details for " + songName + " by " + artist + "...")
     FileManip.editMp3Details(songDir, artist, album, songName, genre, str(energy))
     print("Done!")
-
-def test(songName, artist):
-    pass
 

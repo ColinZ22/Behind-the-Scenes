@@ -74,7 +74,7 @@ def getSongNameACRCloud(songDir):
 
     results = {}
 
-    access_key = APIs.apiKeys["ACRCloud Access Key"]
+    access_key = APIs.apiKeys["ACRCloud API Access Key"]
     access_secret = APIs.apiKeys[ "ACRCloud API Access Secret"]
     requrl = "http://identify-eu-west-1.acrcloud.com/v1/identify"
 
@@ -94,7 +94,9 @@ def getSongNameACRCloud(songDir):
 
     try:
         sample_bytes = os.path.getsize(trimSong(songDir))
-    except:
+    except Exception as e:
+        print("Song Trimming Error")
+        print(e)
         return None
 
     files = [
@@ -116,6 +118,7 @@ def getSongNameACRCloud(songDir):
         return results
     except Exception as e:
         print(response)
+        print(response.json())
         print("Error:", e)
         return None
 
@@ -140,18 +143,21 @@ def autoSongRecognition(songDir):
 
     print("Checking file...")
     if isFakeMp3(songDir):
+        print("Error: Fake MP3 File detected")
         return None
     else:
         print("Starting auto song recognition (utilizing all available services)...")
         songMetadata = getSongNameACRCloud(songDir)
         if songMetadata == "Fake MP3 File!!!":
+            print("Error: Fake MP3 File detected")
             return None
         if songMetadata == "" or songMetadata == None:
             print("ACRCloud failed to recognize the song, falling back to Audd...")
-            songName = getSongNameAudd(songDir)
+            songMetadata = getSongNameAudd(songDir)
             if songMetadata == "" or songMetadata == None:
                 print("Song Recognition failed :( \n")
                 return None
+        print(songMetadata)
         return songMetadata
 
 def test(songDir):

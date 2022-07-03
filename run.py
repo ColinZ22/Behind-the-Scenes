@@ -38,9 +38,9 @@ if __name__ == '__main__':
         dir = sys.argv[1].strip()
 
     audioProcess(dir)
-    print("Songs processed: ", len(completedSongs))
+    print("Number of Songs fully processed: ", len(completedSongs))
     print(completedSongs)
-    print("Songs failed: ", len(errerSongs))
+    print("Number of Songs that caused error(s) during runtime: ", len(errerSongs))
     print(errerSongs)
     if os.path.exists(r"Temp\trimmedSong.mp3"):
         os.remove(r"Temp\trimmedSong.mp3")
